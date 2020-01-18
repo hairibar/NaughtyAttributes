@@ -10,7 +10,7 @@ namespace NaughtyAttributes.Test
 		[Required]
 		public Transform requiredTransform;
 
-		[Required("Must not be null")]
+		[Required(message:"Must not be null")]
 		public GameObject requiredGameObject;
 
 		[ValidateInput("IsNotNull", "must not be null")]
