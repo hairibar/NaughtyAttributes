@@ -23,7 +23,7 @@ namespace NaughtyAttributes.Test
 	[System.Serializable]
 	public class RequiredNest2
 	{
-		[Required("trans2 is invalid custom message - hohoho")]
+		[Required(message:"trans2 is invalid custom message - hohoho")]
 		[AllowNesting] // Because it's nested we need to explicitly allow nesting
 		public Transform trans2;
 	}
