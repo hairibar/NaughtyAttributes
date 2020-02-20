@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NaughtyAttributes
 {
@@ -7,26 +7,13 @@ namespace NaughtyAttributes
 	{
 		public string Name { get; private set; }
 		public float MaxValue { get; private set; }
-		public ProgressBarColor Color { get; private set; }
+		public EColor Color { get; private set; }
 
-		public ProgressBarAttribute(string name = "", float maxValue = 100, ProgressBarColor color = ProgressBarColor.Blue)
+		public ProgressBarAttribute(string name = "", float maxValue = 100, EColor color = EColor.Blue)
 		{
 			Name = name;
 			MaxValue = maxValue;
 			Color = color;
 		}
-	}
-
-	public enum ProgressBarColor
-	{
-		Red,
-		Pink,
-		Orange,
-		Yellow,
-		Green,
-		Blue,
-		Indigo,
-		Violet,
-		White
 	}
 }

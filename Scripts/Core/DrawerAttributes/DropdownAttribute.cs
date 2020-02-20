@@ -1,5 +1,5 @@
+﻿using System.Collections;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace NaughtyAttributes
@@ -7,11 +7,11 @@ namespace NaughtyAttributes
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public class DropdownAttribute : DrawerAttribute
 	{
-		public string ValuesFieldName { get; private set; }
+		public string ValuesName { get; private set; }
 
-		public DropdownAttribute(string valuesFieldName)
+		public DropdownAttribute(string valuesName)
 		{
-			ValuesFieldName = valuesFieldName;
+			ValuesName = valuesName;
 		}
 	}
 

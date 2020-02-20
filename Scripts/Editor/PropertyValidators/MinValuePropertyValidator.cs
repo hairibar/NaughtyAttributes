@@ -1,9 +1,9 @@
+﻿using UnityEngine;
 using UnityEditor;
 
 namespace NaughtyAttributes.Editor
 {
-	[PropertyValidator(typeof(MinValueAttribute))]
-	public class MinValuePropertyValidator : PropertyValidator
+	public class MinValuePropertyValidator : PropertyValidatorBase
 	{
 		public override void ValidateProperty(SerializedProperty property)
 		{
@@ -26,7 +26,7 @@ namespace NaughtyAttributes.Editor
 			else
 			{
 				string warning = minValueAttribute.GetType().Name + " can be used only on int or float fields";
-				EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, context: PropertyUtility.GetTargetObject(property));
+				Debug.LogWarning(warning, property.serializedObject.targetObject);
 			}
 		}
 	}

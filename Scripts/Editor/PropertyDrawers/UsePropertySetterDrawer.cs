@@ -1,27 +1,44 @@
 ﻿using System.Reflection;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace NaughtyAttributes.Editor
 {
-    [PropertyDrawer(typeof(UsePropertySetterAttribute))]
-    public class UsePropertySetterDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(UsePropertySetterAttribute))]
+    public class UsePropertySetterDrawer : PropertyDrawerBase
     {
-        public override void DrawProperty(SerializedProperty serializedProperty)
+        #region Public Drawing API
+        public static void Draw_Layout(SerializedProperty serializedProperty)
+        {
+            Draw_Layout(serializedProperty, serializedProperty.GetLabelContent());
+        }
+
+        public static void Draw_Layout(SerializedProperty serializedProperty, GUIContent label)
+        {
+            Rect rect = EditorGUILayout.GetControlRect();
+            Draw(rect, serializedProperty, label);
+        }
+
+        public static void Draw(Rect rect, SerializedProperty serializedProperty)
+        {
+            Draw(rect, serializedProperty, serializedProperty.GetLabelContent());
+        }
+
+        public static void Draw(Rect rect, SerializedProperty serializedProperty, GUIContent label)
         {
             string warningMessage = "";
 
             //Find the property member
-            PropertyInfo property = FindProperty(serializedProperty);
-            if (property == null || property.SetMethod == null)
+            PropertyInfo nativePropertyInfo = FindProperty(serializedProperty);
+            if (nativePropertyInfo == null || nativePropertyInfo.SetMethod == null)
             {
-                EditorDrawUtility.DrawHelpBox($"No setter was found for member {serializedProperty.name}.",
+                NaughtyEditorGUI.HelpBox_Layout($"No setter was found for member {serializedProperty.name}.",
                     MessageType.Error, logToConsole: false, context: serializedProperty.serializedObject.context);
                 return;
             }
 
             //Draw the appropiate field and get the value entered by the user in the inspector.
-            bool valueChanged = DrawControl(serializedProperty, out object valueSetInInspector, ref warningMessage);
+            bool valueChanged = DrawControl(serializedProperty, rect, label, out object valueSetInInspector, ref warningMessage);
 
             if (valueChanged)
             {
@@ -29,9 +46,9 @@ namespace NaughtyAttributes.Editor
                 //TODO: As of right now, the SerializedProperty's value change is correctly undone, but the setter doesn't get called with the old value.
                 //I'm not sure if that's possible, or even if it would be better that way.
                 Undo.RecordObject(serializedProperty.serializedObject.targetObject, $"Changed {serializedProperty.displayName} in inspector.");
-                
+
                 //Call the setter
-                property.SetValue(serializedProperty.serializedObject.targetObject, valueSetInInspector);
+                nativePropertyInfo.SetValue(serializedProperty.serializedObject.targetObject, valueSetInInspector);
 
                 //Read the value after the setter
                 object processedValue = FindField(serializedProperty).GetValue(serializedProperty.serializedObject.targetObject);
@@ -44,27 +61,31 @@ namespace NaughtyAttributes.Editor
             if (!string.IsNullOrEmpty(warningMessage))
             {
                 warningMessage = warningMessage.Trim();
-                EditorDrawUtility.DrawHelpBox(warningMessage, MessageType.Warning,
+                NaughtyEditorGUI.HelpBox_Layout(warningMessage, MessageType.Warning,
                     logToConsole: false, context: serializedProperty.serializedObject.targetObject);
             }
         }
+        #endregion
 
+        protected override void OnGUI_Internal(Rect rect, SerializedProperty serializedProperty, GUIContent label)
+        {
+            Draw(rect, serializedProperty, label);
+        }
 
         /// <summary>
         /// Draws the appropiate control for this serialized property, returns wether the value changed and gives out the new value.
         /// </summary>
-        private bool DrawControl(SerializedProperty serializedProperty, out object newValue, ref string warningMessage)
+        static bool DrawControl(SerializedProperty serializedProperty, Rect rect, GUIContent guiContent, out object newValue, ref string warningMessage)
         {
             EditorGUI.BeginChangeCheck();
 
-            var guiContent = new GUIContent(serializedProperty.displayName, GetPropertyTooltip(serializedProperty));
-            EditorGUILayout.PropertyField(serializedProperty, guiContent, true);
+            EditorGUI.PropertyField(rect, serializedProperty, guiContent, true);
             newValue = ReadSerializedValue(serializedProperty, ref warningMessage);
 
             return EditorGUI.EndChangeCheck();
-        } 
+        }
 
-        private object ReadSerializedValue(SerializedProperty serializedProperty, ref string warningMessage)
+        static object ReadSerializedValue(SerializedProperty serializedProperty, ref string warningMessage)
         {
             object oldValue = null;
             switch (serializedProperty.propertyType)
@@ -141,70 +162,69 @@ namespace NaughtyAttributes.Editor
                 default:
                     if (string.IsNullOrEmpty(warningMessage))
                         warningMessage += $"{serializedProperty.propertyType} serialized types aren't supported by UsePropertySetterAttribute.";
-                    
                     break;
             }
 
             return oldValue;
         }
 
-        private void ModifySerializedValue(SerializedProperty serializedProperty, object value, ref string warningMessage)
+        static void ModifySerializedValue(SerializedProperty serializedProperty, object value, ref string warningMessage)
         {
             switch (serializedProperty.propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    serializedProperty.intValue = (int)value;
+                    serializedProperty.intValue = (int) value;
                     break;
                 case SerializedPropertyType.Boolean:
-                    serializedProperty.boolValue = (bool)value;
+                    serializedProperty.boolValue = (bool) value;
                     break;
                 case SerializedPropertyType.Float:
-                    serializedProperty.floatValue = (float)value;
+                    serializedProperty.floatValue = (float) value;
                     break;
                 case SerializedPropertyType.String:
-                    serializedProperty.stringValue = (string)value;
+                    serializedProperty.stringValue = (string) value;
                     break;
                 case SerializedPropertyType.Color:
-                    serializedProperty.colorValue = (Color)value;
+                    serializedProperty.colorValue = (Color) value;
                     break;
                 case SerializedPropertyType.ObjectReference:
                     serializedProperty.objectReferenceValue = value as Object;
                     break;
                 case SerializedPropertyType.LayerMask:
-                    serializedProperty.intValue = (LayerMask)value;
+                    serializedProperty.intValue = (LayerMask) value;
                     break;
                 case SerializedPropertyType.Enum:
-                    serializedProperty.enumValueIndex = (int)value;
+                    serializedProperty.enumValueIndex = (int) value;
                     break;
                 case SerializedPropertyType.Vector2:
-                    serializedProperty.vector2Value = (Vector2)value;
+                    serializedProperty.vector2Value = (Vector2) value;
                     break;
                 case SerializedPropertyType.Vector3:
-                    serializedProperty.vector3Value = (Vector3)value;
+                    serializedProperty.vector3Value = (Vector3) value;
                     break;
                 case SerializedPropertyType.Vector4:
-                    serializedProperty.vector4Value = (Vector4)value;
+                    serializedProperty.vector4Value = (Vector4) value;
                     break;
                 case SerializedPropertyType.Rect:
-                    serializedProperty.rectValue = (Rect)value;
+                    serializedProperty.rectValue = (Rect) value;
                     break;
                 case SerializedPropertyType.AnimationCurve:
-                    serializedProperty.animationCurveValue = (AnimationCurve)value;
+                    serializedProperty.animationCurveValue = (AnimationCurve) value;
                     break;
                 case SerializedPropertyType.Bounds:
-                    serializedProperty.boundsValue = (Bounds)value;
+                    serializedProperty.boundsValue = (Bounds) value;
                     break;
                 case SerializedPropertyType.Vector2Int:
-                    serializedProperty.vector2IntValue = (Vector2Int)value;
+                    serializedProperty.vector2IntValue = (Vector2Int) value;
                     break;
                 case SerializedPropertyType.Vector3Int:
-                    serializedProperty.vector3IntValue = (Vector3Int)value;
+                    serializedProperty.vector3IntValue = (Vector3Int) value;
                     break;
                 case SerializedPropertyType.RectInt:
-                    serializedProperty.rectIntValue = (RectInt)value;
+                    serializedProperty.rectIntValue = (RectInt) value;
                     break;
                 case SerializedPropertyType.BoundsInt:
-                    serializedProperty.boundsIntValue = (BoundsInt)value;
+                    serializedProperty.boundsIntValue = (BoundsInt) value;
                     break;
                 default:
                     if (string.IsNullOrEmpty(warningMessage))
@@ -216,27 +236,26 @@ namespace NaughtyAttributes.Editor
         /// <summary>
         /// Tries to find the member property. Not guaranteed to find one, as the given name (or auto name) could be wrong.
         /// </summary>
-        private PropertyInfo FindProperty(SerializedProperty serializedProperty)
+        static PropertyInfo FindProperty(SerializedProperty serializedProperty)
         {
             UsePropertySetterAttribute attribute = PropertyUtility.GetAttribute<UsePropertySetterAttribute>(serializedProperty);
 
             string propertyName;
             if (attribute.autoFindProperty) propertyName = serializedProperty.displayName.Replace(" ", string.Empty);
             else propertyName = attribute.propertyName;
-            
             Object targetObject = serializedProperty.serializedObject.targetObject;
 
             return ReflectionUtility.GetProperty(targetObject, propertyName);
         }
 
-        private FieldInfo FindField(SerializedProperty serializedProperty)
+        static FieldInfo FindField(SerializedProperty serializedProperty)
         {
             Object targetObject = serializedProperty.serializedObject.targetObject;
             return ReflectionUtility.GetField(targetObject, serializedProperty.name);
         }
 
         //SerializedProperty.tooltip has been broken for years, so we get it manually instead.
-        private string GetPropertyTooltip(SerializedProperty serializedProperty)
+        static string GetPropertyTooltip(SerializedProperty serializedProperty)
         {
             return PropertyUtility.GetAttribute<TooltipAttribute>(serializedProperty)?.tooltip;
         }

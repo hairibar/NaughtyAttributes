@@ -1,9 +1,9 @@
+﻿using UnityEngine;
 using UnityEditor;
 
 namespace NaughtyAttributes.Editor
 {
-	[PropertyValidator(typeof(MaxValueAttribute))]
-	public class MaxValuePropertyValidator : PropertyValidator
+	public class MaxValuePropertyValidator : PropertyValidatorBase
 	{
 		public override void ValidateProperty(SerializedProperty property)
 		{
@@ -26,7 +26,7 @@ namespace NaughtyAttributes.Editor
 			else
 			{
 				string warning = maxValueAttribute.GetType().Name + " can be used only on int or float fields";
-				EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, context: PropertyUtility.GetTargetObject(property));
+				Debug.LogWarning(warning, property.serializedObject.targetObject);
 			}
 		}
 	}
