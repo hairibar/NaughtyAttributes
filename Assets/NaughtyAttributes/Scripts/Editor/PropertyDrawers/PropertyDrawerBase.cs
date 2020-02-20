@@ -5,6 +5,11 @@ namespace NaughtyAttributes.Editor
 {
 	public abstract class PropertyDrawerBase : PropertyDrawer
 	{
+		public virtual float GetPropertyHeight(SerializedProperty property)
+		{
+			return EditorGUI.GetPropertyHeight(property, true);
+		}
+
 		public sealed override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
 		{
 			// Check if visible
@@ -37,17 +42,12 @@ namespace NaughtyAttributes.Editor
 
 		protected abstract void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label);
 
-		public virtual float GetPropertyHeight(SerializedProperty property)
-		{
-			return EditorGUI.GetPropertyHeight(property, true);
-		}
-
-		public virtual float GetHelpBoxHeight()
+		protected virtual float GetHelpBoxHeight()
 		{
 			return EditorGUIUtility.singleLineHeight * 3.0f;
 		}
 
-		public void DrawDefaultPropertyAndHelpBox(Rect rect, SerializedProperty property, string message, MessageType messageType)
+		protected void DrawDefaultPropertyAndHelpBox(Rect rect, SerializedProperty property, string message)
 		{
 			float indentLength = NaughtyEditorGUI.GetIndentLength(rect);
 			Rect helpBoxRect = new Rect(

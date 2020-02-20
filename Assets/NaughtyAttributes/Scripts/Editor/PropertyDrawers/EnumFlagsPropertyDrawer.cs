@@ -29,7 +29,7 @@ namespace NaughtyAttributes.Editor
 			else
 			{
 				string message = attribute.GetType().Name + " can be used only on enums";
-				DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
+				DrawDefaultPropertyAndHelpBox(rect, property, message);
 			}
 
 			EditorGUI.EndProperty();

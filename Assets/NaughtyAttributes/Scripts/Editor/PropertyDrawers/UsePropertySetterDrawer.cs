@@ -253,11 +253,5 @@ namespace NaughtyAttributes.Editor
             Object targetObject = serializedProperty.serializedObject.targetObject;
             return ReflectionUtility.GetField(targetObject, serializedProperty.name);
         }
-
-        //SerializedProperty.tooltip has been broken for years, so we get it manually instead.
-        static string GetPropertyTooltip(SerializedProperty serializedProperty)
-        {
-            return PropertyUtility.GetAttribute<TooltipAttribute>(serializedProperty)?.tooltip;
-        }
     }
 }
