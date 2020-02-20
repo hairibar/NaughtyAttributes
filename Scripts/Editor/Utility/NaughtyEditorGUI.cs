@@ -257,6 +257,12 @@ namespace NaughtyAttributes.Editor
 			return isDrawn;
 		}
 
+		public static void DrawHeader(string header)
+		{
+			EditorGUILayout.Space();
+			EditorGUILayout.LabelField(header, EditorStyles.boldLabel);
+		}
+
 		private static void DebugLogMessage(string message, MessageType type, UnityEngine.Object context)
 		{
 			switch (type)
