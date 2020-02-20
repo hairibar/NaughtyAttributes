@@ -65,7 +65,7 @@ namespace NaughtyAttributes.Editor
             float floatFieldValue = EditorGUI.FloatField(numberRect, convertedValue);
             if (EditorGUI.EndChangeCheck())
             {
-                convertedValue = floatFieldValue;
+                convertedValue = Mathf.Clamp(leftValue, rightValue, floatFieldValue);
             }
 
             return convertedValue;
