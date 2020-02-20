@@ -1,16 +1,25 @@
+﻿using UnityEngine;
 using UnityEditor;
-using UnityEngine;
 
 namespace NaughtyAttributes.Editor
 {
-	[PropertyDrawer(typeof(ReadOnlyAttribute))]
-	public class ReadOnlyPropertyDrawer : PropertyDrawer
+	[CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
+	public class ReadOnlyPropertyDrawer : PropertyDrawerBase
 	{
-		public override void DrawProperty(SerializedProperty property)
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
+			return GetPropertyHeight(property);
+		}
+
+		protected override void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label)
+		{
+			EditorGUI.BeginProperty(rect, label, property);
+
 			GUI.enabled = false;
-			EditorDrawUtility.DrawPropertyField(property);
+			EditorGUI.PropertyField(rect, property, label, true);
 			GUI.enabled = true;
+
+			EditorGUI.EndProperty();
 		}
 	}
 }

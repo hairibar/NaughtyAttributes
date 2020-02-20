@@ -1,16 +1,15 @@
-using System;
+﻿using UnityEditor;
 using System.Reflection;
-using UnityEditor;
+using System;
 
 namespace NaughtyAttributes.Editor
 {
-	[PropertyValidator(typeof(ValidateInputAttribute))]
-	public class ValidateInputPropertyValidator : PropertyValidator
+	public class ValidateInputPropertyValidator : PropertyValidatorBase
 	{
 		public override void ValidateProperty(SerializedProperty property)
 		{
 			ValidateInputAttribute validateInputAttribute = PropertyUtility.GetAttribute<ValidateInputAttribute>(property);
-			UnityEngine.Object target = PropertyUtility.GetTargetObject(property);
+			object target = PropertyUtility.GetTargetObjectWithProperty(property);
 
 			MethodInfo validationCallback = ReflectionUtility.GetMethod(target, validateInputAttribute.CallbackName);
 
@@ -28,18 +27,20 @@ namespace NaughtyAttributes.Editor
 					{
 						if (string.IsNullOrEmpty(validateInputAttribute.Message))
 						{
-							EditorDrawUtility.DrawHelpBox(property.name + " is not valid", MessageType.Error, context: target);
+							NaughtyEditorGUI.HelpBox_Layout(
+								property.name + " is not valid", MessageType.Error, context: property.serializedObject.targetObject);
 						}
 						else
 						{
-							EditorDrawUtility.DrawHelpBox(validateInputAttribute.Message, MessageType.Error, context: target);
+							NaughtyEditorGUI.HelpBox_Layout(
+								validateInputAttribute.Message, MessageType.Error, context: property.serializedObject.targetObject);
 						}
 					}
 				}
 				else
 				{
 					string warning = "The field type is not the same as the callback's parameter type";
-					EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, context: target);
+					NaughtyEditorGUI.HelpBox_Layout(warning, MessageType.Warning, context: property.serializedObject.targetObject);
 				}
 			}
 			else
@@ -48,7 +49,7 @@ namespace NaughtyAttributes.Editor
 					validateInputAttribute.GetType().Name +
 					" needs a callback with boolean return type and a single parameter of the same type as the field";
 
-				EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, context: target);
+				NaughtyEditorGUI.HelpBox_Layout(warning, MessageType.Warning, context: property.serializedObject.targetObject);
 			}
 		}
 	}

@@ -1,51 +1,60 @@
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEditor;
 
 namespace NaughtyAttributes.Editor
 {
-	[PropertyDrawer(typeof(MinMaxSliderAttribute))]
-	public class MinMaxSliderPropertyDrawer : PropertyDrawer
+	[CustomPropertyDrawer(typeof(MinMaxSliderAttribute))]
+	public class MinMaxSliderPropertyDrawer : PropertyDrawerBase
 	{
-		public override void DrawProperty(SerializedProperty property)
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			EditorDrawUtility.DrawHeader(property);
+			return (property.propertyType == SerializedPropertyType.Vector2)
+				? GetPropertyHeight(property)
+				: GetPropertyHeight(property) + GetHelpBoxHeight();
+		}
 
-			MinMaxSliderAttribute minMaxSliderAttribute = PropertyUtility.GetAttribute<MinMaxSliderAttribute>(property);
+		protected override void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label)
+		{
+			EditorGUI.BeginProperty(rect, label, property);
+
+			MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)attribute;
 
 			if (property.propertyType == SerializedPropertyType.Vector2)
 			{
-				Rect controlRect = EditorGUILayout.GetControlRect();
+				EditorGUI.BeginProperty(rect, label, property);
+
+				float indentLength = NaughtyEditorGUI.GetIndentLength(rect);
 				float labelWidth = EditorGUIUtility.labelWidth;
 				float floatFieldWidth = EditorGUIUtility.fieldWidth;
-				float sliderWidth = controlRect.width - labelWidth - 2f * floatFieldWidth;
+				float sliderWidth = rect.width - labelWidth - 2f * floatFieldWidth;
 				float sliderPadding = 5f;
 
 				Rect labelRect = new Rect(
-					controlRect.x,
-					controlRect.y,
+					rect.x,
+					rect.y,
 					labelWidth,
-					controlRect.height);
+					rect.height);
 
 				Rect sliderRect = new Rect(
-					controlRect.x + labelWidth + floatFieldWidth + sliderPadding,
-					controlRect.y,
-					sliderWidth - 2f * sliderPadding,
-					controlRect.height);
+					rect.x + labelWidth + floatFieldWidth + sliderPadding - indentLength,
+					rect.y,
+					sliderWidth - 2f * sliderPadding + indentLength,
+					rect.height);
 
 				Rect minFloatFieldRect = new Rect(
-					controlRect.x + labelWidth,
-					controlRect.y,
-					floatFieldWidth,
-					controlRect.height);
+					rect.x + labelWidth - indentLength,
+					rect.y,
+					floatFieldWidth + indentLength,
+					rect.height);
 
 				Rect maxFloatFieldRect = new Rect(
-					controlRect.x + labelWidth + floatFieldWidth + sliderWidth,
-					controlRect.y,
-					floatFieldWidth,
-					controlRect.height);
+					rect.x + labelWidth + floatFieldWidth + sliderWidth - indentLength,
+					rect.y,
+					floatFieldWidth + indentLength,
+					rect.height);
 
 				// Draw the label
-				EditorGUI.LabelField(labelRect, property.displayName);
+				EditorGUI.LabelField(labelRect, label.text);
 
 				// Draw the slider
 				EditorGUI.BeginChangeCheck();
@@ -63,14 +72,16 @@ namespace NaughtyAttributes.Editor
 				{
 					property.vector2Value = sliderValue;
 				}
+
+				EditorGUI.EndProperty();
 			}
 			else
 			{
-				string warning = minMaxSliderAttribute.GetType().Name + " can be used only on Vector2 fields";
-				EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, context: PropertyUtility.GetTargetObject(property));
-
-				EditorDrawUtility.DrawPropertyField(property);
+				string message = minMaxSliderAttribute.GetType().Name + " can be used only on Vector2 fields";
+				DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
 			}
+
+			EditorGUI.EndProperty();
 		}
 	}
 }
