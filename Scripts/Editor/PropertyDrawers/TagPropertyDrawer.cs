@@ -53,7 +53,7 @@ namespace NaughtyAttributes.Editor
 			else
 			{
 				string message = string.Format("{0} supports only string fields", typeof(TagAttribute).Name);
-				DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
+				DrawDefaultPropertyAndHelpBox(rect, property, message);
 			}
 		}
 	}

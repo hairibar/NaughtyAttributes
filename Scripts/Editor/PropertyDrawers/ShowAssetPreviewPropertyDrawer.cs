@@ -59,7 +59,7 @@ namespace NaughtyAttributes.Editor
 			else
 			{
 				string message = property.name + " doesn't have an asset preview";
-				DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
+				DrawDefaultPropertyAndHelpBox(rect, property, message);
 			}
 
 			EditorGUI.EndProperty();

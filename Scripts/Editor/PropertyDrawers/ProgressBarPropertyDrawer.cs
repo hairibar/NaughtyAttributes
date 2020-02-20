@@ -18,7 +18,7 @@ namespace NaughtyAttributes.Editor
 			if (!IsNumber(property))
 			{
 				string message = string.Format("Field {0} is not a number", property.name);
-				DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
+				DrawDefaultPropertyAndHelpBox(rect, property, message);
 				return;
 			}
 

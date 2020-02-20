@@ -58,7 +58,7 @@ namespace NaughtyAttributes.Editor
 			else
 			{
 				string message = typeof(ResizableTextAreaAttribute).Name + " can only be used on string fields";
-				DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
+				DrawDefaultPropertyAndHelpBox(rect, property, message);
 			}
 
 			EditorGUI.EndProperty();
