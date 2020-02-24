@@ -1,7 +1,7 @@
 {
   "name": "com.hairibar.naughtyattributes",
   "displayName": "NaughtyAttributes",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "unity": "2018.3",
   "description": "NaughtyAttributes is an extension for the Unity Inspector. This is a fork mantainted by Aitor Iribar.",
   "keywords": [ "attribute", "inspector", "editor" ],
