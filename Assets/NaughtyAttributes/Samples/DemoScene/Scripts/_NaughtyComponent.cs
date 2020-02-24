@@ -5,25 +5,32 @@ namespace NaughtyAttributes.Test
 {
 	public class _NaughtyComponent : MonoBehaviour
 	{
-		[Label("Short Name")]
-		public string veryVeryLongName;
+		public bool flag0 = true;
+		public bool flag1 = true;
 
-		[Label("RGB")]
-		public Vector3 vectorXYZ;
+		[BoxGroup("Sliders")]
+		[MinMaxSlider(0, 1)]
+		[ShowIf("flag0")]
+		public Vector2 slider0;
+
+		[BoxGroup("Sliders")]
+		[MinMaxSlider(0, 1)]
+		[ShowIf("flag1")]
+		public Vector2 slider1;
 	}
 
-	[System.Serializable]
-	public class MyClass
-	{
-		public string level1;
+	//[System.Serializable]
+	//public class MyClass
+	//{
+	//	public string level1;
 
-		public MyStruct myStruct;
-	}
+	//	public MyStruct myStruct;
+	//}
 
-	[System.Serializable]
-	public struct MyStruct
-	{
-		[ResizableTextArea]
-		public string level2;
-	}
+	//[System.Serializable]
+	//public struct MyStruct
+	//{
+	//	[ResizableTextArea]
+	//	public string level2;
+	//}
 }
