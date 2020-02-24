@@ -24,30 +24,7 @@ namespace NaughtyAttributes.Editor
 
 				if (!_reorderableListsByPropertyName.ContainsKey(key))
 				{
-					ReorderableList reorderableList = new ReorderableList(property.serializedObject, property, true, true, true, true)
-					{
-						drawHeaderCallback = (Rect rect) =>
-						{
-							EditorGUI.LabelField(rect, string.Format("{0}: {1}", label.text, property.arraySize), EditorStyles.boldLabel);
-						},
-
-						drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-						{
-							SerializedProperty element = property.GetArrayElementAtIndex(index);
-							rect.y += 1.0f;
-							rect.x += 10.0f;
-							rect.width -= 10.0f;
-
-							EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, 0.0f), element, true);
-						},
-
-						elementHeightCallback = (int index) =>
-						{
-							return EditorGUI.GetPropertyHeight(property.GetArrayElementAtIndex(index)) + 4.0f;
-						}
-					};
-
-					_reorderableListsByPropertyName[key] = reorderableList;
+					_reorderableListsByPropertyName[key] = ReorderableListUtility.Create(property, true, true, true, true, label.text);
 				}
 
 				_reorderableListsByPropertyName[key].DoLayoutList();
