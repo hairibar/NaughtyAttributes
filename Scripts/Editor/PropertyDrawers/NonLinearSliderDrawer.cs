@@ -19,7 +19,7 @@ namespace NaughtyAttributes.Editor
 
         public static void Draw_Layout(SerializedProperty serializedProperty, float leftValue, float rightValue, Function function, GUIContent guiContent)
         {
-            Rect rect = GetLayoutRect();
+            Rect rect = EditorGUILayout.GetControlRect();
             EditorGUI.BeginProperty(rect, GUIContent.none, serializedProperty);
 
             serializedProperty.floatValue = Draw(rect, guiContent, serializedProperty.floatValue, leftValue, rightValue, function);
@@ -29,7 +29,7 @@ namespace NaughtyAttributes.Editor
 
         public static float Draw_Layout(GUIContent guiContent, float value, float leftValue, float rightValue, Function function)
         {
-            Rect rect = GetLayoutRect();
+            Rect rect = EditorGUILayout.GetControlRect();
 
             return Draw(rect, guiContent, value, leftValue, rightValue, function);
         }
@@ -72,12 +72,6 @@ namespace NaughtyAttributes.Editor
         }
         #endregion
 
-        static Rect GetLayoutRect()
-        {
-            return EditorGUILayout.GetControlRect();
-        }
-
-
         protected override void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label)
         {
             QuadraticSliderAttribute quadraticAttribute = PropertyUtility.GetAttribute<QuadraticSliderAttribute>(property);
@@ -93,7 +87,7 @@ namespace NaughtyAttributes.Editor
             public Func<float, float> function;
             public Func<float, float> backwardsFunction;
 
-            public static Function Quadratic(int power)
+            public static Function Quadratic(float power)
             {
                 return new Function
                 {
@@ -103,5 +97,4 @@ namespace NaughtyAttributes.Editor
             }
         }
     }
-
 }
