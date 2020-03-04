@@ -55,20 +55,46 @@ namespace NaughtyAttributes.Editor
             if (guiContent != null) controlRect = EditorGUI.PrefixLabel(rect, guiContent);
             else controlRect = rect;
 
+            bool sliderChanged = DrawSlider(value, leftValue, rightValue, function, ref controlRect, out float sliderValue);
+            bool numericInputFieldChanged = DrawNumericInputField(value, leftValue, rightValue, controlRect, out float numericInputFieldValue);
+
+            if (sliderChanged)
+            {
+                return sliderValue;
+            }
+            else if (numericInputFieldChanged)
+            {
+                return numericInputFieldValue;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+
+        static bool DrawSlider(float value, float leftValue, float rightValue, Function function, ref Rect controlRect, out float inputValue)
+        {
+            EditorGUI.BeginChangeCheck();
+
             Rect sliderRect = new Rect(controlRect.x, controlRect.y, controlRect.width - SLIDER_NUMBER_FIELD_WIDTH - SLIDER_MARGIN_SIZE, controlRect.height);
 
             float sliderValue = GUI.HorizontalSlider(sliderRect, function.backwardsFunction(value), leftValue, rightValue);
             float convertedValue = function.function(sliderValue);
 
-            EditorGUI.BeginChangeCheck();
-            Rect numberRect = new Rect(controlRect.xMax - SLIDER_NUMBER_FIELD_WIDTH, controlRect.y, SLIDER_NUMBER_FIELD_WIDTH, controlRect.height);
-            float floatFieldValue = EditorGUI.FloatField(numberRect, convertedValue);
-            if (EditorGUI.EndChangeCheck())
-            {
-                convertedValue = Mathf.Clamp(leftValue, rightValue, floatFieldValue);
-            }
+            inputValue = convertedValue;
+            return EditorGUI.EndChangeCheck();
+        }
 
-            return convertedValue;
+        static bool DrawNumericInputField(float currentValue, float min, float max, Rect controlRect, out float inputValue)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            Rect numberRect = new Rect(controlRect.xMax - SLIDER_NUMBER_FIELD_WIDTH, controlRect.y, SLIDER_NUMBER_FIELD_WIDTH, controlRect.height);
+            float floatFieldValue = EditorGUI.FloatField(numberRect, currentValue);
+
+            inputValue = Mathf.Clamp(floatFieldValue, min, max);
+            return EditorGUI.EndChangeCheck();
         }
         #endregion
 
